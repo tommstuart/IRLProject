@@ -27,8 +27,12 @@ def policy_iteration(env, gamma, pi=None):
     state_values = copy.deepcopy(env.rewards)
     while True:
         old_pi = copy.deepcopy(pi)
-        state_values = compute_v_for_pi(env, pi, gamma, state_values)
-        pi = np.argmax(__compute_q_with_v(env, state_values, gamma), axis=1)
+        #distribution over actions for each time. 
+        #They had state values because their pi maps states to the probabilities 
+        #For us our pi maps times to the probabilities. 
+        #So our state values is like {distribution over actions at time t : t \in T} 
+        state_values = compute_v_for_pi(env, pi, gamma, state_values) 
+        pi = np.argmax(compute_q_with_v(env, state_values, gamma), axis=1) 
         if np.all(old_pi == pi):
             return pi
         else:
