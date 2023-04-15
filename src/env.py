@@ -1,14 +1,22 @@
 from RewardFunctions import SingleStateReward
+import gymnasium as gym 
 
-class SingleStateSpace():
-    #k is the number of actions
-    def __init__(self, k, Rmax):
-        self.reward = SingleStateReward(self, Rmax = 10, k = k)
-        self.k = Rmax 
-        self.states = [0]
+class SingleStateSpace(gym.Env): 
+    def __init__(self, k, Rmax): 
+        self.reward = SingleStateReward(self, Rmax = 10, k = k) 
+        self.k = k
+        self.Rmax = Rmax 
+        self.states = [0] 
+        self.actions = [0..k-1] # I mean this probably doesn't work but you get the point - I need to declare this here I think 
+
+    def step(self, s, a ,t): 
+        assert 0<=a<self.k 
+        reward = self.reward(a,t) 
+        return (0, reward) 
     
-    def do_action(self, s, a, t): 
-        assert 0<=a<self.k
-        reward = self.reward(a, t)
+    def reset(self): 
+        self.states = [0] 
 
-        return reward #don't need to update state space because there's only one. 
+
+    #Doesn't need to do anything here 
+    #do I need render/close 
