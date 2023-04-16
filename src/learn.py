@@ -6,7 +6,7 @@ from policy import Boltzmann
 #Could just pass in the times instead of the observations. idk what gamma was, delta could be like a class variable here instead of a parameter
 def policy_iteration(env, observations, R, delta=1e-4, pi=None):
     n_observations = len(observations) 
-    #Lets set up observations to be [(s,a,t), (s,a,t),...] 
+    #Lets set up observations to be [(s,a,t), (s,a,t),...] - might need to be tuples to extract in a for loop - we'll see 
     #or well rather [ [s,a,t], [s,a,t], ..., [s,a,t]] 
     times = observations[:, 2] #extract the times of each observations
 
@@ -19,9 +19,6 @@ def policy_iteration(env, observations, R, delta=1e-4, pi=None):
 
     n_iter = 0
     diff = 1 
-    #idk if this will work I might need to do some array shuffling after this operation 
-    #I'm confused bc they use the env rewards but I don't think we can do that, I think we need to pass it in ? 
-    # R = np.vectorize(env.reward)(env.states, env.actions, times) #I want this to give R = [R_t_1,...,R_t_m] where R_t_k has dimensions |S| x |A|
     values = np.random.rand(env.n_states, n_observations)#|S| x |T| so |S| x n_observations probably doesn't need to be random 
 
     #Policy Evaluation

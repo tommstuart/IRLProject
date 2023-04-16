@@ -3,10 +3,10 @@ import gymnasium as gym
 import numpy as np 
 
 class SingleStateSpace(gym.Env): 
-    def __init__(self, k, discount_rate, Rmax): 
+    def __init__(self, k, discount_rate, R_max): 
         self.reward = SingleStateReward(self, Rmax = 10, k = k) 
         self.k = k
-        self.Rmax = Rmax 
+        self.R_max = R_max 
         self.discount_rate = discount_rate 
 
         self.states = [0] 
