@@ -1,13 +1,20 @@
 from RewardFunctions import SingleStateReward
 import gymnasium as gym 
+import numpy as np 
 
 class SingleStateSpace(gym.Env): 
-    def __init__(self, k, Rmax): 
+    def __init__(self, k, discount_rate, Rmax): 
         self.reward = SingleStateReward(self, Rmax = 10, k = k) 
         self.k = k
         self.Rmax = Rmax 
+        self.discount_rate = discount_rate 
+
         self.states = [0] 
-        self.actions = [0..k-1] # I mean this probably doesn't work but you get the point - I need to declare this here I think 
+        self.n_states = 1
+        self.actions = list(range(k))
+        self.n_actions = k 
+
+        self.P = np.ones(1,self.n_actions,1) 
 
     def step(self, s, a ,t): 
         assert 0<=a<self.k 
