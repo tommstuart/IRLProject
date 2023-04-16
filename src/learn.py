@@ -4,7 +4,7 @@ from policy import Boltzmann
 
 
 #Could just pass in the times instead of the observations. idk what gamma was, delta could be like a class variable here instead of a parameter
-def policy_iteration(env, observations, delta=1e-4, pi=None):
+def policy_iteration(env, observations, R, delta=1e-4, pi=None):
     n_observations = len(observations) 
     #Lets set up observations to be [(s,a,t), (s,a,t),...] 
     #or well rather [ [s,a,t], [s,a,t], ..., [s,a,t]] 
@@ -20,7 +20,8 @@ def policy_iteration(env, observations, delta=1e-4, pi=None):
     n_iter = 0
     diff = 1 
     #idk if this will work I might need to do some array shuffling after this operation 
-    R = np.vectorize(env.reward)(env.states, env.actions, times) #I want this to give R = [R_t_1,...,R_t_m] where R_t_k has dimensions |S| x |A|
+    #I'm confused bc they use the env rewards but I don't think we can do that, I think we need to pass it in ? 
+    # R = np.vectorize(env.reward)(env.states, env.actions, times) #I want this to give R = [R_t_1,...,R_t_m] where R_t_k has dimensions |S| x |A|
     values = np.random.rand(env.n_states, n_observations)#|S| x |T| so |S| x n_observations probably doesn't need to be random 
 
     #Policy Evaluation
@@ -39,7 +40,7 @@ def policy_iteration(env, observations, delta=1e-4, pi=None):
             b = pi[s,t] 
             q_vals = []
             for a in env.n_actions: 
-                q_vals[a] = compute_q_pi(env,s,a,t,values,R)
+                q_vals[a] = compute_q_with_values(env,s,a,t,values,R)
                
             boltzmann = Boltzmann(q_vals, env.actions)
             pi[s,t] = boltzmann.getDistribution(s,t)
@@ -61,7 +62,11 @@ def compute_v_pi(env,pi,s,t,values,R):
 #         sum += env.discount_rate*env.P[s,a,s_]*values[s_,t]
 
 #this is equivalent to above if you say \forall s', s'' in S, R(s,a,s') = R(s,a,s'') or if you have determinism or something 
-def compute_q_pi(env,s,a,t,values,R): 
+def compute_q_with_values(env,s,a,t,values,R): 
     sum = 0
     for s_ in env.n_states: 
         sum += env.P[s,a,s_](R[s,a,s_] + env.discount_rate*values[s_,t])
+def compute_q_with_pi(env,s,a,t,pi,R):
+    values = compute_v_pi(**locals()) #no idea if this works otherwise re-run the stuff in policy eval etc., surely that can't work.
+    return compute_q_with_values(env, s,a,t,values,R)
+
