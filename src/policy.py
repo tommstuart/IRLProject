@@ -6,6 +6,9 @@ class Policy:
         self.actions = actions 
     def __call__(self,s, t): 
         raise NotImplementedError 
+    
+def choose_a_from_pi(pi,s,t):
+    return np.random.choice([*range(pi.shape[1])], p = pi[s,:,t])
 
 class Boltzmann(Policy): 
     def __init__(self, q, alpha = 0.1):
