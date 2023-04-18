@@ -12,7 +12,10 @@ def choose_a_from_pi(pi,s,t):
     return np.random.choice([*range(pi.shape[1])], p = pi[s,:,t])
 
 class Boltzmann(Policy): 
-    def __init__(self, q, actions, alpha = 0.9):
+    def __init__(self, q, actions, alpha = 0.5): #ok so upping the alpha doesn't make a difference. Higher alpha means we're more confident in the expert to make high value decisions 
+        #which makes me think that it's going to be something wrong with the V/Q calculations 
+
+        #It does seem to effect the spread of the results though like higher alpha means you get 0.5,..,0.5 ish rewards and then 0 rewards for a while whereas before it was like 0.50.5000.50.5 like fast alternations 
         super(Boltzmann, self).__init__(q, actions) 
         self.temp = 1/alpha 
         self.actions = actions
