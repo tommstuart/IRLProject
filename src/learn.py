@@ -4,20 +4,16 @@ from policy import Boltzmann
 from utils import normalise_pi
 
 #Could just pass in the times instead of the observations. idk what gamma was, delta could be like a class variable here instead of a parameter
-def policy_iteration(env, observations, R, delta=1e-4, pi=None):
-    n_observations = len(observations) 
-    #Lets set up observations to be [(s,a,t), (s,a,t),...] - might need to be tuples to extract in a for loop - we'll see 
-    #or well rather [ [s,a,t], [s,a,t], ..., [s,a,t]] 
-    times = np.asarray(observations)[:, 2] #extract the times of each observations
+def policy_iteration(env, n_observations, R, delta=1e-4, pi=None):
 
     #initialise pi randomly
     if pi is None: 
         pi = np.random.choice(env.actions, (env.n_states, n_observations)) 
     values = np.random.rand(env.n_states, n_observations)
-    iters = 0 
+    
     while True: 
         diff = 1
-
+        iters = 0
         #Policy Evaluation
         while(diff > delta): #surely this just guarantees convergence on one state-time pair - no because it's the max of all of them 
             diff = 0 #the diff shrank suspiciously, like it divided by 10 each time which was weird. 10 = n_actions or something 
@@ -46,11 +42,6 @@ def policy_iteration(env, observations, R, delta=1e-4, pi=None):
                     policy_stable = False
         if policy_stable == True: 
             return (pi,values)
-        else:
-            # Go back to Policy Evaluation
-            iters = 0 
-            diff = 1
-            continue
 
 def compute_v_pi(env,pi,s,t,values,R):
     sum = 0 
@@ -64,7 +55,11 @@ def compute_q_with_values(env,s,a,t,values,R):
     for s_ in range(env.n_states): 
         sum += env.P[s,a,s_]*(R[s,a,s_] + env.discount_rate*values[s_,t])
     return sum 
-def compute_q_with_pi(env,s,a,t,pi,values,R):
-    # values = compute_v_pi(env, pi, s, t, values, R) #no idea if this works otherwise re-run the stuff in policy eval etc., surely that can't work.
-    return compute_q_with_values(env, s,a,t,values,R)
+
+#I need to get a function which just returns the whole Q matrix rather than keep doing a triple loop and calling this it's daft 
+    
+    
+# def compute_q_with_pi(env,s,a,t,pi,values,R):
+#     # values = compute_v_pi(env, pi, s, t, values, R) #no idea if this works otherwise re-run the stuff in policy eval etc., surely that can't work.
+#     return compute_q_with_values(env, s,a,t,values,R)
 
