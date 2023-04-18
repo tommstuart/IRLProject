@@ -10,24 +10,24 @@ def policy_walk(env, observations, step_size = 0.05): #no idea what a normal ste
     #Pick a random reward vector - I need to figure out the grid thingy 
     R = np.random.rand(env.n_states, env.n_actions, n_observations) #S x A x T
     #Perform policy iteration 
-    pi = learn.policy_iteration(env, observations, R)
+    (pi,values) = learn.policy_iteration(env, observations, R)
 
     iters = 0 
     #not sure when to stop yet? 
     while iters < 1000: 
-        if (iters%10 == 0):
-            print(".")
+        if (iters%100 == 0):
+            print(pi)
         R_tild = get_neighbouring_reward(R, step_size) 
-        q = np.ones(env.n_states, env.n_actions, n_observations)
-        values = np.ones(env.n_states, env.n_actions, n_observations)
+        q = np.ones((env.n_states, env.n_actions, n_observations))
+        # values = np.ones((env.n_states, env.n_actions, n_observations))
         #should rlly vectorize more stuff but this is fine for now it makes it clearer
-        for s in env.n_states:
-            for a in env.n_actions:
-                for t in n_observations:                 
-                    q[s,a,t] = learn.compute_q_with_pi(env,s,a,t,pi,R_tild)
+        for s in range(env.n_states):
+            for a in range(env.n_actions):
+                for t in range(n_observations):               
+                    q[s,a,t] = learn.compute_q_with_pi(env,s,a,t,pi,values,R_tild)
 
         if is_better(env, n_observations, q, pi):
-            pi_tild = learn.policy_iteration(env, observations, R_tild, pi = pi)
+            (pi_tild, values_tild) = learn.policy_iteration(env, observations, R_tild, pi = pi)
             ratio = calculate_posterior(observations, R_tild, env.R_max, pi_tild)/calculate_posterior(observations, R, env.R_max, pi)
             p = min(1,ratio)
             if random.random() < p:
@@ -44,9 +44,9 @@ def policy_walk(env, observations, step_size = 0.05): #no idea what a normal ste
 
 #again their algorithm isn't really designed to work with the mapping to a distribution 
 def is_better(env, n_observations, q, pi):
-    for s in env.n_states:
-        for a in env.n_actions: 
-            for t in n_observations: 
+    for s in range(env.n_states):
+        for a in range(env.n_actions): 
+            for t in range(n_observations): 
                 #Here I just sample an action from pi, don't know if this is what you're meant to do bc I'm using a stochastic policy 
                 if q[s,choose_a_from_pi(pi,s,t),t] < q[s,a,t]: 
                     return True
@@ -59,7 +59,8 @@ def get_neighbouring_reward(R, step_size):
 def calculate_likelihood(observations, pi): 
     product = 1
     for [s,a,t] in observations: #might need to do tuples 
-        product *= pi[s,t][a]
+        product *= pi[s,a,t]
+    return product
 
 #P_prior(R) * P(O|R) - not technically the posterior since I don't divide it by the probability of the observation but it doesn't matter. 
 def calculate_posterior(observations, R, R_max, pi): 

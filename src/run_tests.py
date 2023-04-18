@@ -23,7 +23,7 @@ print(observation_times)
 # Use meshgrid to create a grid of all possible combinations of s, a, and t
 s_grid, a_grid, t_grid = np.meshgrid(env.states, env.actions, observation_times, indexing='ij')
 
-# Calculate the reward for each combination using vectorized operations
+# Calculate the reward for each combination using vectorized operations - oh I'm not actually using a boltzmann policy here I'm just using a normalised reward vector? 
 pi = np.vectorize(env.reward)(s_grid, a_grid, t_grid)
 pi = normalise_pi(pi)
 
@@ -39,9 +39,15 @@ print("Running policy walk")
 learned_pi = policy_walk(env, observations)
 print("finished learning policy")
 
+print("Learned policy: ", learned_pi) 
+print("True policy", pi)
+
+print("done")
 #generate the trajectory 
 #run birl on the trajectory 
 #take the reward and the initial reward and compare 
-
+#ok for some reason it's learning the same - very wrong - policy for each time instance 
+#it's also just not really learning it's basically just producing a seeimingly uniform random thing 
+# it does add up to one though which is a slight plus 
 
 #I'm gonna need prints/logs to see how badly it converges. 
