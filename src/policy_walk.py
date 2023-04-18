@@ -48,14 +48,17 @@ def is_better(env, n_observations, q, pi):
         for a in range(env.n_actions): 
             for t in range(n_observations): 
                 #Here I just sample an action from pi, don't know if this is what you're meant to do bc I'm using a stochastic policy 
-                if q[s,choose_a_from_pi(pi,s,t),t] < q[s,a,t]: 
+                if q[s,pi[s,t],t] < q[s,a,t]: 
                     return True
     return False
         
 #not sure whether you're meant to do it like this or shift it by the actual step size randomly in each direction 
+#yeah you're not meant to do it like that - it's a mcmc step and it's meant to be more complicated I think, but I don't see why this 
+#wouldn't work? 
 def get_neighbouring_reward(R, step_size): 
     return R + np.random.uniform(-step_size, step_size, R.shape)
 
+#These need changing, apparently I'm meant to use boltzmann somewhere 
 def calculate_likelihood(observations, pi): 
     product = 1
     for [s,a,t] in observations: #might need to do tuples 
