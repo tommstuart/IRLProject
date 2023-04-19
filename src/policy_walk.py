@@ -15,9 +15,6 @@ def policy_walk(env, observations, optimal_q_values, step_size = 0.05): #no idea
     iters = 0 
     #not sure when to stop yet? 
     while iters < 1000: 
-        if (iters%100 == 0):
-            print(pi)
-
         R_tild = get_neighbouring_reward(R, step_size) 
         (pi_tild, values_tild) = learn.policy_iteration(env, n_observations, R_tild, pi = pi)
 

@@ -9,7 +9,6 @@ def generate_trajectory(env, pi, observation_times):
         old_state = current_state
         a = pi(current_state,t)
         (current_state, reward) = env.step(current_state, a, observation_times[t]) #probably don't need these
-        print("reward", reward)
         observations.append([old_state, a, t])
     return observations
 #ugh to generate a proper policy I'll need to define my reward function, then find the Q-values of it all and then pass it into my 

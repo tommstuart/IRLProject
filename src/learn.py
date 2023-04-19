@@ -19,7 +19,6 @@ def policy_iteration(env, n_observations, R, delta=1e-4, pi=None):
             diff = 0 #the diff shrank suspiciously, like it divided by 10 each time which was weird. 10 = n_actions or something 
             for s in range(env.n_states):
                 for t in range(n_observations):
-                    # print(values[s,t])
                     v = values[s,t] 
                     values[s,t] = compute_v_pi(env, pi, s, t, values, R)
                     diff = max(diff, abs(v - values[s,t]))
@@ -27,7 +26,6 @@ def policy_iteration(env, n_observations, R, delta=1e-4, pi=None):
             if iters > 1000: 
                 print("failed to converge") 
                 print(diff) 
-        print(values)
         #Policy Improvement
         policy_stable = True 
         max_Q = 0 
