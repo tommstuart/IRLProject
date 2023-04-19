@@ -39,7 +39,7 @@ def policy_walk(env, observations, optimal_q_values, step_size = 0.05): #no idea
             if random.random() < p: 
                 R = R_tild 
         iters+=1 
-    return pi
+    return R
 
 
 #again their algorithm isn't really designed to work with the mapping to a distribution 

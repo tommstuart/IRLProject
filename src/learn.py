@@ -27,7 +27,7 @@ def policy_iteration(env, n_observations, R, delta=1e-4, pi=None):
             if iters > 1000: 
                 print("failed to converge") 
                 print(diff) 
-        
+        print(values)
         #Policy Improvement
         policy_stable = True 
         max_Q = 0 
@@ -53,7 +53,7 @@ def compute_v_pi(env,pi,s,t,values,R):
 def compute_q_with_values(env,s,a,t,values,R): 
     sum = 0
     for s_ in range(env.n_states): 
-        sum += env.P[s,a,s_]*(R[s,a,s_] + env.discount_rate*values[s_,t])
+        sum += env.P[s,a,s_]*(R[s,a,t] + env.discount_rate*values[s_,t])
     return sum 
 
 #I need to get a function which just returns the whole Q matrix rather than keep doing a triple loop and calling this it's daft 
