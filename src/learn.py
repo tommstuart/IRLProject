@@ -28,7 +28,6 @@ def policy_iteration(env, n_observations, R, delta=1e-4, pi=None):
                 print(diff) 
         #Policy Improvement
         policy_stable = True 
-        max_Q = 0 
         for s in range(env.n_states):
             for t in range(n_observations):
                 b = pi[s,t]   
