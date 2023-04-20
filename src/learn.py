@@ -1,9 +1,7 @@
 import numpy as np 
-import math
 from policy import Boltzmann 
-from utils import normalise_pi
 
-#Could just pass in the times instead of the observations. idk what gamma was, delta could be like a class variable here instead of a parameter
+#Could just pass in the times instead of the observations, delta could be like a class variable here instead of a parameter
 def policy_iteration(env, n_observations, R, delta=1e-4, pi=None):
 
     #initialise pi randomly
@@ -13,19 +11,16 @@ def policy_iteration(env, n_observations, R, delta=1e-4, pi=None):
     
     while True: 
         diff = 1
-        iters = 0
+
         #Policy Evaluation
-        while(diff > delta): #surely this just guarantees convergence on one state-time pair - no because it's the max of all of them 
-            diff = 0 #the diff shrank suspiciously, like it divided by 10 each time which was weird. 10 = n_actions or something 
+        while(diff > delta):
+            diff = 0
             for s in range(env.n_states):
                 for t in range(n_observations):
                     v = values[s,t] 
                     values[s,t] = compute_v_pi(env, pi, s, t, values, R)
                     diff = max(diff, abs(v - values[s,t]))
-            iters += 1 
-            if iters > 1000: 
-                print("failed to converge") 
-                print(diff) 
+
         #Policy Improvement
         policy_stable = True 
         for s in range(env.n_states):
@@ -54,9 +49,3 @@ def compute_q_with_values(env,s,a,t,values,R):
     return sum 
 
 #I need to get a function which just returns the whole Q matrix rather than keep doing a triple loop and calling this it's daft 
-    
-    
-# def compute_q_with_pi(env,s,a,t,pi,values,R):
-#     # values = compute_v_pi(env, pi, s, t, values, R) #no idea if this works otherwise re-run the stuff in policy eval etc., surely that can't work.
-#     return compute_q_with_values(env, s,a,t,values,R)
-

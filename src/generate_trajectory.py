@@ -1,5 +1,3 @@
-import random 
-from policy import choose_a_from_pi
 current_time = 0.0 
 def generate_trajectory(env, pi, observation_times):
     actions = []
@@ -8,8 +6,6 @@ def generate_trajectory(env, pi, observation_times):
     for t in range(len(observation_times)):
         old_state = current_state
         a = pi(current_state,t)
-        (current_state, reward) = env.step(current_state, a, observation_times[t]) #probably don't need these
+        (current_state, _) = env.step(current_state, a, observation_times[t])
         observations.append([old_state, a, t])
     return observations
-#ugh to generate a proper policy I'll need to define my reward function, then find the Q-values of it all and then pass it into my 
-#Boltzmann policy 

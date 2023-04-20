@@ -6,6 +6,7 @@ import numpy as np
 
 class SingleStateSpace(gym.Env): 
     def __init__(self, n_actions, discount_rate, R_max=5): 
+        #I think I need to call __init__ on the super class 
         self.reward = SingleStateReward(R_max = R_max, n_actions = n_actions) 
         self.R_max = R_max 
         self.discount_rate = discount_rate 
@@ -23,13 +24,11 @@ class SingleStateSpace(gym.Env):
         assert 0<=a<self.n_actions 
         reward = self.reward(s,a,t) 
         next_state = np.random.choice([*range(self.n_states)], p = self.P[s,a,:]) #randomly choose a next state according to the transition model 
-        # self.current_state = next_state # unnecessary here 
+        # self.current_state = next_state # unnecessary here - single state 
         return (next_state, reward) 
     
     def reset(self): 
         self.states = [0] 
         self.current_state = 0 
 
-
-    #Doesn't need to do anything here 
     #do I need render/close 
