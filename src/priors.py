@@ -11,4 +11,4 @@ import numpy as np
 
 def uniform_prior_probability(R, R_max):
     #surely this is just going to always return a really low number? 
-    return np.count_nonzero((0 <= R) & (R <= R_max))/(R.size*R_max)
+    return np.count_nonzero((0 < R) & (R <= R_max))/(R.size*R_max)

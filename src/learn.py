@@ -2,7 +2,7 @@ import numpy as np
 from policy import Boltzmann 
 
 #Could just pass in the times instead of the observations, delta could be like a class variable here instead of a parameter
-def policy_iteration(env, n_observations, R, delta=1e-4, pi=None, values = None, q_values = 0):
+def policy_iteration(env, n_observations, R, delta=1e-4, pi=None, values = None, q_values = None):
 
     #initialise pi randomly
     if pi is None: 
@@ -10,7 +10,7 @@ def policy_iteration(env, n_observations, R, delta=1e-4, pi=None, values = None,
     if values is None: 
         values = np.random.rand(env.n_states, n_observations)
     if q_values is None:
-        q_values = np.zeros(env.n_states,env.n_actions,n_observations)
+        q_values = np.zeros((env.n_states,env.n_actions,n_observations))
     
     while True: 
         diff = 1
@@ -31,7 +31,7 @@ def policy_iteration(env, n_observations, R, delta=1e-4, pi=None, values = None,
                 b = pi[s,t]   
                 for a in range(env.n_actions): 
                     q_values[s,a,t] = compute_q_with_values(env,s,a,t,values,R)
-                pi[s,t] = np.argmax(q_values) 
+                pi[s,t] = np.argmax(q_values[s,:,t]) 
                 if b != pi[s,t]:
                     policy_stable = False
         if policy_stable == True: 

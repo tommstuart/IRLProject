@@ -5,7 +5,7 @@ import random
 from policy import choose_a_from_pi
 #ondrej said it's the prior*likelihood. So P(R) * P(O|R) 
 
-def policy_walk(env, observations, step_size = 0.05): #no idea what a normal step size is - they do 0.05 so I guess this is reasonable 
+def policy_walk(env, observations, step_size = 0.05, n_iters = 10000): #no idea what a normal step size is - they do 0.05 so I guess this is reasonable 
     n_observations = len(observations) 
     #Pick a random reward vector - I need to figure out the grid thingy 
     R = np.random.rand(env.n_states, env.n_actions, n_observations) #S x A x T
@@ -14,7 +14,7 @@ def policy_walk(env, observations, step_size = 0.05): #no idea what a normal ste
 
     iters = 0 
     sampled_rewards = [] 
-    while iters < 10000: 
+    while iters < n_iters: 
         R_tild = get_neighbouring_reward(R, step_size) 
         #I can just pass in the previous values array and then not have to generate it randomly at the start of each 
         #policy iteration 
@@ -22,10 +22,10 @@ def policy_walk(env, observations, step_size = 0.05): #no idea what a normal ste
 
         #Maybe do value iteration i.e. combine the two loops of policy iteration and then you don't need to do this check because the policy you compute will be optimal 
         #
-        # if is_better(env, n_observations, q_tild, pi):
+        # if is_better(env, n_observations, q_values_tild, pi):
         ratio = calculate_posterior(env,observations, R_tild, env.R_max, pi_tild)/calculate_posterior(env,observations, R, env.R_max, pi)
         p = min(1,ratio)
-        if random.random() < p:
+        if (random.random() < p):
             R = R_tild 
             values = values_tild 
             q_values = q_values_tild
@@ -33,7 +33,7 @@ def policy_walk(env, observations, step_size = 0.05): #no idea what a normal ste
         # else:
         #     ratio = calculate_posterior(env,observations, R_tild, env.R_max, pi)/calculate_posterior(env,observations, R, env.R_max, pi) 
         #     p = min(1,ratio) 
-        #     if random.random() < p: 
+        #     if (random.random() < p): 
         #         R = R_tild 
         iters+=1 
         sampled_rewards.append(R)
