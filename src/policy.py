@@ -16,7 +16,7 @@ class Boltzmann(Policy):
         self.temp = 1/alpha 
         self.actions = actions
 
-    def __call__(self, s, t): 
+    def __call__(self, s, t): #This is normalised wrong but it doesn't make a difference for now, the np.randomchoice figures it all out. 
         q_vals = [] 
         for a in self.actions: #find the q value for each action 
             q_vals.append(self.q[s,a,t]) 
@@ -26,5 +26,6 @@ class Boltzmann(Policy):
     
     def getDistribution(self, q_vals):
         exp_q = np.exp(q_vals/self.temp) 
-        z = np.sum(exp_q) 
-        return exp_q/z 
+        sums = np.sum(exp_q, axis = 1) 
+        sums = sums[:,np.newaxis, :] 
+        return exp_q/sums 

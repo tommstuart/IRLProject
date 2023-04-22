@@ -3,8 +3,7 @@ import learn
 from policy import Boltzmann
 import random 
 
-def policy_walk(env, observations, step_size = 0.05, n_iters = 10000): #no idea what a normal step size is - they do 0.05 so I guess this is reasonable 
-    n_observations = len(observations) 
+def policy_walk(env, observations, n_observations, step_size = 0.05, n_iters = 10000): #no idea what a normal step size is - they do 0.05 so I guess this is reasonable 
     #Pick a random reward vector - I need to figure out the grid thingy 
     R = np.random.rand(env.n_states, env.n_actions, n_observations) #S x A x T
     #Perform policy iteration 
@@ -14,25 +13,16 @@ def policy_walk(env, observations, step_size = 0.05, n_iters = 10000): #no idea 
     sampled_rewards = [] 
     while iters < n_iters: 
         R_tild = get_neighbouring_reward(R, step_size) 
-        #I can just pass in the previous values array and then not have to generate it randomly at the start of each 
-        #policy iteration 
         (pi_tild, values_tild, q_values_tild) = learn.policy_iteration(env, n_observations, R_tild, pi = pi, values = values, q_values = q_values)
 
         #Maybe do value iteration i.e. combine the two loops of policy iteration and then you don't need to do this check because the policy you compute will be optimal 
-        #
-        # if is_better(env, n_observations, q_values_tild, pi):
-        ratio = calculate_posterior(env,observations, R_tild, env.R_max)/calculate_posterior(env,observations, R, env.R_max)
+        ratio = calculate_posterior(env,observations,n_observations, R_tild, env.R_max)/calculate_posterior(env,observations, n_observations, R, env.R_max)
         p = min(1,ratio)
         if (random.random() < p):
             R = R_tild 
             values = values_tild 
             q_values = q_values_tild
             pi = pi_tild 
-        # else:
-        #     ratio = calculate_posterior(env,observations, R_tild, env.R_max, pi)/calculate_posterior(env,observations, R, env.R_max, pi) 
-        #     p = min(1,ratio) 
-        #     if (random.random() < p): 
-        #         R = R_tild 
         iters+=1 
         sampled_rewards.append(R)
     return sampled_rewards
@@ -51,18 +41,17 @@ def get_neighbouring_reward(R, step_size):
 
 #is it right that we're testing likelihood wrt the boltzmann like this or should we be calculating the likelihood
 #of the observation with respect to pi/pi_tild ?? 
-def calculate_likelihood(env, observations, R): #look at doing it with log likelihoods 
-    (optimal_pi, optimal_values, optimal_q_values) = learn.policy_iteration(env, len(observations), R) 
+def calculate_likelihood(env, observations, n_observations, R): #look at doing it with log likelihoods 
+    (optimal_pi, optimal_values, optimal_q_values) = learn.policy_iteration(env, n_observations, R) 
     
-    boltzmann = Boltzmann(optimal_q_values, env.actions)
+    boltzmann = Boltzmann(optimal_q_values, env.actions, alpha = 5) #what alpha should we use here - if we use too low this always returns low because everything is so random/noisy
     dist = boltzmann.getDistribution(optimal_q_values)
     product = 1 
     for (s,a,t) in observations: 
         product*=dist[s,a,t]
     return product 
 
-#Not sure if my posterior/likelihood calculations are correct
 #P_prior(R) * P(O|R) - not technically the posterior since I don't divide it by the probability of the observation but it doesn't matter. 
-def calculate_posterior(env, observations, R, R_max): 
+def calculate_posterior(env, observations, n_observations, R, R_max): 
     from priors import uniform_prior_probability 
-    return uniform_prior_probability(R, R_max)*calculate_likelihood(env, observations, R)   
+    return uniform_prior_probability(R, R_max)*calculate_likelihood(env, observations, n_observations, R)   

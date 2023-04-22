@@ -30,5 +30,3 @@ class SingleStateSpace(gym.Env):
     def reset(self): 
         self.states = [0] 
         self.current_state = 0 
-
-    #do I need render/close 
