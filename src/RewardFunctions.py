@@ -10,4 +10,4 @@ class SingleStateReward:
         self.R_max = R_max  
         self.n_actions = n_actions 
     def __call__(self, s, a, t): 
-        return Phi(lambda t: sawtooth(t,self.n_actions), t, a)
+        return self.R_max*Phi(lambda t: sawtooth(t,self.n_actions), t, a)

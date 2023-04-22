@@ -2,8 +2,6 @@ import numpy as np
 import learn
 from policy import Boltzmann
 import random 
-from policy import choose_a_from_pi
-#ondrej said it's the prior*likelihood. So P(R) * P(O|R) 
 
 def policy_walk(env, observations, step_size = 0.05, n_iters = 10000): #no idea what a normal step size is - they do 0.05 so I guess this is reasonable 
     n_observations = len(observations) 
@@ -23,7 +21,7 @@ def policy_walk(env, observations, step_size = 0.05, n_iters = 10000): #no idea 
         #Maybe do value iteration i.e. combine the two loops of policy iteration and then you don't need to do this check because the policy you compute will be optimal 
         #
         # if is_better(env, n_observations, q_values_tild, pi):
-        ratio = calculate_posterior(env,observations, R_tild, env.R_max, pi_tild)/calculate_posterior(env,observations, R, env.R_max, pi)
+        ratio = calculate_posterior(env,observations, R_tild, env.R_max)/calculate_posterior(env,observations, R, env.R_max)
         p = min(1,ratio)
         if (random.random() < p):
             R = R_tild 
@@ -48,10 +46,11 @@ def is_better(env, n_observations, q, pi):
                     return True
     return False
 
-#this is probably wrong
 def get_neighbouring_reward(R, step_size): 
     return R + np.random.uniform(-step_size, step_size, R.shape)
 
+#is it right that we're testing likelihood wrt the boltzmann like this or should we be calculating the likelihood
+#of the observation with respect to pi/pi_tild ?? 
 def calculate_likelihood(env, observations, R): #look at doing it with log likelihoods 
     (optimal_pi, optimal_values, optimal_q_values) = learn.policy_iteration(env, len(observations), R) 
     
@@ -64,6 +63,6 @@ def calculate_likelihood(env, observations, R): #look at doing it with log likel
 
 #Not sure if my posterior/likelihood calculations are correct
 #P_prior(R) * P(O|R) - not technically the posterior since I don't divide it by the probability of the observation but it doesn't matter. 
-def calculate_posterior(env, observations, R, R_max, pi): 
+def calculate_posterior(env, observations, R, R_max): 
     from priors import uniform_prior_probability 
     return uniform_prior_probability(R, R_max)*calculate_likelihood(env, observations, R)   
