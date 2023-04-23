@@ -1,15 +1,23 @@
 import numpy as np 
 from policy import Boltzmann 
+import copy
 
 def policy_iteration(env, n_observations, R, delta=1e-4, pi=None, values = None, q_values = None):
 
     #initialise pi randomly
     if pi is None: 
         pi = np.random.choice(env.actions, (env.n_states, n_observations)) 
+    else:
+        pi = copy.copy(pi)
     if values is None: 
         values = np.random.rand(env.n_states, n_observations)
+    else:
+        values = copy.copy(values)
     if q_values is None:
         q_values = np.zeros((env.n_states,env.n_actions,n_observations))
+    else: 
+        q_values = copy.copy(q_values) 
+    
     
     while True: 
         diff = 1
@@ -33,13 +41,13 @@ def policy_iteration(env, n_observations, R, delta=1e-4, pi=None, values = None,
                 pi[s,t] = np.argmax(q_values[s,:,t]) 
                 if b != pi[s,t]:
                     policy_stable = False
-        if policy_stable == True: 
+        if policy_stable: 
             return (pi,values,q_values)
 
 def compute_v_pi(env,pi,s,t,values,R):
     sum = 0 
     for s_ in range(env.n_states): 
-        sum += env.P[s,pi[s,t],s_]*(R[s,pi[s,t],s_] + env.discount_rate*values[s_,t])
+        sum += env.P[s,pi[s,t],s_]*(R[s,pi[s,t],t] + env.discount_rate*values[s_,t])
     return sum
 
 #this is equivalent to above if you say \forall s', s'' in S, R(s,a,s') = R(s,a,s'') or if you have determinism or something 
