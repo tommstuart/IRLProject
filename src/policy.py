@@ -12,20 +12,18 @@ def choose_a_from_pi(pi,s,t):
 
 class Boltzmann(Policy): 
     #larger alpha means agent sticks to reward more
-    def __init__(self, q, actions, alpha = 0.5):
+    def __init__(self, q, actions, alpha):
         super(Boltzmann, self).__init__(q, actions) 
-        self.temp = 1/alpha 
+        
         self.actions = actions
-    #This is normalised wrong but it doesn't make a difference for now, the np.randomchoice figures it all out. 
-    def __call__(self, s, t): 
-        q_vals = [] 
-        for a in self.actions: 
-            q_vals.append(self.q[s,a,t]) 
-        dist = self.getDistribution(q_vals) 
-        return np.random.choice(self.actions, p = dist) 
-    
-    def getDistribution(self, q_vals):
-        exp_q = np.exp(q_vals/self.temp) 
+
+        #Sets up the distribution i.e. self.dist[s,:,t] is a distribution over actions for a given 
+        #state-time pair 
+        temp = 1/alpha 
+        exp_q = np.exp(q/temp) 
         sums = np.sum(exp_q, axis = 1) 
         sums = sums[:,np.newaxis, :] 
-        return exp_q/sums 
+        self.dist = exp_q/sums 
+
+    def __call__(self, s, t): 
+        return np.random.choice(self.actions, p = self.dist[s,:,t])

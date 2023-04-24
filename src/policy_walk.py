@@ -42,10 +42,9 @@ def gaussian_mcmc_step(R, var):
 #of the observation with respect to pi/pi_tild ?? 
 def calculate_likelihood(env, observations,optimal_q_values,alpha): #look at doing it with log likelihoods 
     boltzmann = Boltzmann(optimal_q_values, env.actions, alpha = alpha)
-    dist = boltzmann.getDistribution(optimal_q_values)
     product = 1 
     for (s,a,t) in observations: 
-        product*=dist[s,a,t]
+        product*=boltzmann.dist[s,a,t]
     return product 
 
 #P_prior(R) * P(O|R) - not technically the posterior since I don't divide it by the probability of the observation but it doesn't matter. 
