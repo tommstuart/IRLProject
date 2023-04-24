@@ -4,7 +4,7 @@ import copy
 
 def policy_iteration(env, n_observations, R, delta=1e-4, pi=None, values = None, q_values = None):
 
-    #initialise pi randomly
+    #Normally we pass in these to save recalculating them, but on the first call we randomly initialise pi and values.
     if pi is None: 
         pi = np.random.choice(env.actions, (env.n_states, n_observations)) 
     else:
