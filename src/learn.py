@@ -1,10 +1,12 @@
 import numpy as np 
 from policy import Boltzmann 
 
+# I'd recommend passing in only one of pi, values, and q_values, and computing the others from it. q_values would be my pick
 def policy_iteration(env, n_observations, R, delta=1e-4, pi=None, values = None, q_values = None):
 
     #initialise pi randomly
-    if pi is None: 
+    if pi is None:
+        # if values or q_values are provided, it'd be better to calculate pi using them
         pi = np.random.choice(env.actions, (env.n_states, n_observations)) 
     if values is None: 
         values = np.random.rand(env.n_states, n_observations)
@@ -38,7 +40,8 @@ def policy_iteration(env, n_observations, R, delta=1e-4, pi=None, values = None,
 
 def compute_v_pi(env,pi,s,t,values,R):
     sum = 0 
-    for s_ in range(env.n_states): 
+    for s_ in range(env.n_states):
+        # !!!    You're using s_ as the last index of R — shouldn't it be t?   !!!
         sum += env.P[s,pi[s,t],s_]*(R[s,pi[s,t],s_] + env.discount_rate*values[s_,t])
     return sum
 
