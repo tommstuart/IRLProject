@@ -5,7 +5,7 @@ import random
 from priors import uniform_prior_probability 
 
 def policy_walk(env, observations, n_observations, alpha, step_size, n_iters = 10000): #no idea what a normal step size is - they do 0.05 so I guess this is reasonable 
-    #Pick a random reward vector - I need to figure out the grid thingy 
+    #Pick a random reward vector
     R = np.random.rand(env.n_states, env.n_actions, n_observations) #S x A x T
     #Perform policy iteration 
     acceptance_probs = np.zeros(n_iters)
@@ -35,6 +35,7 @@ def policy_walk(env, observations, n_observations, alpha, step_size, n_iters = 1
 def uniform_mcmc_step(R, step_size): 
     return R + np.random.uniform(-step_size, step_size, R.shape)
 
+#flatten it all - you want smaller perturbations in some places than others
 def gaussian_mcmc_step(R, var):
     return np.random.normal(R,var) 
 
@@ -49,4 +50,4 @@ def calculate_likelihood(env, observations,optimal_q_values,alpha): #look at doi
 
 #P_prior(R) * P(O|R) - not technically the posterior since I don't divide it by the probability of the observation but it doesn't matter. 
 def calculate_posterior(env, observations,q_values, R, R_max, alpha): 
-        return uniform_prior_probability(R, R_max)*calculate_likelihood(env, observations,q_values,alpha = alpha)   
+        return uniform_prior_probability(R, R_max)*calculate_likelihood(env, observations,q_values,alpha = alpha)  #at time zero it's uniform and every subsequent step it's a gaussian perturbation 
