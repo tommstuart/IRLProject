@@ -1,11 +1,46 @@
-import math 
 import numpy as np 
 
-#This essentially says that our only prior information is that the reward is somewhere between 0 and R_max and will ignore
-#reward matrices that don't lie in this range. 
+#Essentially just says that our reward lies somewhere between 0 and R_max 
+class UniformPrior(): 
+    def __init__(self, R_max): 
+        self.R_max = R_max 
+    def __call__(self, R):
+        return uniform_prior_probability(R,self.R_max)
+
+class TimeDependentPrior():
+    def __init__(self, observation_times, R_max, sigma): 
+        self.R_max = R_max 
+        self.observation_times = observation_times 
+        self.n_observations = len(observation_times)
+        self.sigma = sigma 
+        
+    def __call__(self, R): 
+        return uniform_prior_probability(R,self.R_max)*self.closeness_requirement(R)
+        
+    #Centred at 0 - I've optimised this for using a constant variance rather than a cov matrix 
+    def unnormalised_gaussian(self,x,cov_inv): 
+        x_flat = x.flatten()
+        #(x_flat - 0).T * Sigma^-1 * (x_flat)
+        #Assuming cov_inv is a scalar here for now 
+        return np.exp(-0.5*np.dot(x_flat,x_flat)*cov_inv)
+        # return np.exp(-0.5*np.matmul(np.matmul((x_flat-mean).T, cov_inv), x_flat-mean))
+
+    def closeness_requirement(self, R): 
+        product = 1 
+
+        #Just doing pairwise now for performance sake 
+        for i in range(self.n_observations-1): 
+            # for j in range(n_observations): 
+            #     if i != j: 
+            x = R[:,:,i] - R[:,:,i+1]
+            time_diff = abs(self.observation_times[i] - self.observation_times[i+1])
+            cov_inv = 1/(time_diff*self.sigma)
+            product *= self.unnormalised_gaussian(x,cov_inv) 
+        return product
+            
+
 def uniform_prior_probability(R, R_max):
     if np.all((0<R) & (R<=R_max)):
-        #returning 1 here only works because we're computing a ratio. 
-        return 1 
+        return 1 #returning 1 here only works because we're computing a ratio. 
     else: 
         return 0
