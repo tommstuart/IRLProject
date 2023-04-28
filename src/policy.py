@@ -16,7 +16,6 @@ class Boltzmann(Policy):
         super(Boltzmann, self).__init__(q, actions) 
         
         self.actions = actions
-
         #Sets up the distribution i.e. self.dist[s,:,t] is a distribution over actions for a given 
         #state-time pair 
         temp = 1/alpha 
@@ -24,6 +23,9 @@ class Boltzmann(Policy):
         sums = np.sum(exp_q, axis = 1) 
         sums = sums[:,np.newaxis, :] 
         self.dist = exp_q/sums 
+
+        #ln(exp_q/sums) = ln(exp_q) - ln(sums) = q/temp - ln(sums) 
+        self.logdist = q/temp - np.log(sums)
 
     def __call__(self, s, t): 
         return np.random.choice(self.actions, p = self.dist[s,:,t])
